@@ -1,0 +1,317 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARAGEM RETRO 80s - Sistema de Orçamento Rápido</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fontes Retro do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        retro: {
+                            bg: '#0a0017',
+                            card: '#16002c',
+                            border: '#ff007f',
+                            cyan: '#00f6ff',
+                            pink: '#ff007f',
+                            purple: '#9d4edd',
+                            yellow: '#ffe600',
+                            green: '#00ff66',
+                            dark: '#050014'
+                        }
+                    },
+                    fontFamily: {
+                        pixel: ['"VT323"', 'monospace'],
+                        tech: ['"Orbitron"', 'sans-serif'],
+                        mono: ['"Share Tech Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Efeito CRT Scanlines */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.35) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Efeitos Neon Text & Box Glow */
+        .glow-pink { text-shadow: 0 0 5px #ff007f, 0 0 12px #ff007f; }
+        .glow-cyan { text-shadow: 0 0 5px #00f6ff, 0 0 12px #00f6ff; }
+        .glow-yellow { text-shadow: 0 0 5px #ffe600, 0 0 10px #ffe600; }
+        .glow-green { text-shadow: 0 0 5px #00ff66, 0 0 12px #00ff66; }
+
+        .box-glow-pink { box-shadow: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 8px rgba(255, 0, 127, 0.2); }
+        .box-glow-cyan { box-shadow: 0 0 15px rgba(0, 246, 255, 0.4), inset 0 0 8px rgba(0, 246, 255, 0.2); }
+        .box-glow-green { box-shadow: 0 0 15px rgba(0, 255, 102, 0.4), inset 0 0 8px rgba(0, 255, 102, 0.2); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0017; }
+        ::-webkit-scrollbar-thumb { background: #ff007f; border-radius: 4px; }
+
+        /* Otimização para Impressão limpa sem botões */
+        @media print {
+            body { background: white !important; color: black !important; font-family: Arial, sans-serif !important; }
+            .no-print, .scanlines { display: none !important; }
+            .print-card { background: white !important; border: 1px solid #000 !important; box-shadow: none !important; color: black !important; }
+            .print-text { color: black !important; text-shadow: none !important; }
+            input, select { border: none !important; background: transparent !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="bg-retro-bg text-gray-200 font-mono min-h-screen selection:bg-retro-pink selection:text-white relative">
+    
+    <!-- Camada Overlay Scanlines -->
+    <div id="scanlineOverlay" class="scanlines fixed inset-0 z-50"></div>
+
+    <div class="max-w-6xl mx-auto p-3 sm:p-6 pb-20">
+        
+        <!-- CABEÇALHO RETRO DA OFICINA -->
+        <header class="border-4 border-retro-pink rounded-xl p-4 mb-6 bg-retro-card box-glow-pink relative overflow-hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+                
+                <!-- Título Neon -->
+                <div class="text-center md:text-left flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-lg bg-retro-dark border-2 border-retro-cyan flex items-center justify-center text-retro-cyan text-3xl box-glow-cyan">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-tech text-2xl sm:text-3xl md:text-4xl font-black italic tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-retro-pink via-retro-yellow to-retro-cyan glow-pink">
+                            GARAGEM RETRO 80s
+                        </h1>
+                        <p class="text-xs sm:text-sm text-retro-cyan tracking-widest uppercase font-pixel text-lg glow-cyan">
+                            [ ORÇAMENTO RÁPIDO & ASSISTÊNCIA CYBER AUTOMOTIVA ]
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Relógio Digital Neon em Tempo Real -->
+                <div class="flex flex-col items-center md:items-end gap-2">
+                    <div class="bg-retro-dark border-2 border-retro-yellow px-4 py-1.5 rounded-lg text-right box-glow-pink">
+                        <div id="digitalClock" class="font-pixel text-2xl sm:text-3xl text-retro-yellow tracking-widest glow-yellow">
+                            00:00:00
+                        </div>
+                        <div id="digitalDate" class="text-xs text-retro-cyan tracking-wider">
+                            00/00/0000
+                        </div>
+                    </div>
+                    
+                    <!-- Botões Rápidos CRT e Limpeza -->
+                    <div class="flex gap-2 no-print">
+                        <button onclick="toggleScanlines()" id="btnScanline" class="text-xs px-2.5 py-1 border border-retro-purple rounded text-retro-cyan hover:bg-retro-purple hover:text-white transition-all">
+                            <i class="fa-solid fa-tv"></i> Efeito CRT: ON
+                        </button>
+                        <button onclick="limparFormularioCompleto()" class="text-xs px-2.5 py-1 border border-red-500 rounded text-red-400 hover:bg-red-500 hover:text-white transition-all">
+                            <i class="fa-solid fa-rotate-left"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- LAYOUT PRINCIPAL -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- COLUNA ESQUERDA: CLIENTE + ADIÇÃO DE ITENS (5 colunas) -->
+            <div class="lg:col-span-5 flex flex-col gap-6 no-print">
+                
+                <!-- 1. DADOS DO CLIENTE E VEÍCULO -->
+                <section class="border-2 border-retro-cyan rounded-xl p-4 bg-retro-card box-glow-cyan">
+                    <h2 class="font-tech text-base sm:text-lg text-retro-cyan font-bold mb-3 flex items-center gap-2 border-b border-retro-cyan/30 pb-2">
+                        <i class="fa-solid fa-user text-retro-pink"></i> 1. CLIENTE & VEÍCULO
+                    </h2>
+
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <label class="block text-xs text-retro-cyan mb-1">NOME DO CLIENTE</label>
+                            <input type="text" id="cliNome" placeholder="Ex: Marty McFly" 
+                                class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-pink transition-all">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-retro-cyan mb-1">WHATSAPP / TEL</label>
+                                <input type="tel" id="cliTelefone" placeholder="(11) 99999-9999" 
+                                    class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-pink transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-retro-cyan mb-1">PLACA</label>
+                                <input type="text" id="veicPlaca" placeholder="ABC-1234" 
+                                    class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white uppercase focus:outline-none focus:border-retro-pink transition-all font-pixel text-lg tracking-widest text-retro-yellow">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-retro-cyan mb-1">MODELO DO VEÍCULO</label>
+                            <input type="text" id="veicModelo" placeholder="Ex: Chevette 1.6 / Gol GT 1.8" 
+                                class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-pink transition-all">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-retro-cyan mb-1">ANO</label>
+                                <input type="number" id="veicAno" placeholder="1988" 
+                                    class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-pink transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-retro-cyan mb-1">KM ATUAL</label>
+                                <input type="number" id="veicKm" placeholder="120000" 
+                                    class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-pink transition-all">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. ADIÇÃO DE PEÇAS E MÃO DE OBRA -->
+                <section class="border-2 border-retro-pink rounded-xl p-4 bg-retro-card box-glow-pink">
+                    <h2 class="font-tech text-base sm:text-lg text-retro-pink font-bold mb-3 flex items-center gap-2 border-b border-retro-pink/30 pb-2">
+                        <i class="fa-solid fa-gears text-retro-cyan"></i> 2. ADICIONAR ITEM
+                    </h2>
+
+                    <form id="itemForm" onsubmit="adicionarItem(event)" class="space-y-3 text-sm">
+                        <div>
+                            <label class="block text-xs text-retro-pink mb-1">DESCRIÇÃO DA PEÇA / SERVIÇO</label>
+                            <input type="text" id="itemDesc" required placeholder="Ex: Troca de Carburador / Mão de Obra" 
+                                class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-cyan transition-all">
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="col-span-1">
+                                <label class="block text-xs text-retro-pink mb-1">TIPO</label>
+                                <select id="itemTipo" class="w-full bg-retro-dark border border-retro-purple rounded px-2 py-2 text-white focus:outline-none focus:border-retro-cyan text-xs">
+                                    <option value="Peça">Peça</option>
+                                    <option value="Mão de Obra">Mão de Obra</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-retro-pink mb-1">QTD</label>
+                                <input type="number" id="itemQtd" required min="1" value="1" 
+                                    class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-cyan transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-retro-pink mb-1">VALOR (R$)</label>
+                                <input type="number" id="itemValor" step="0.01" min="0" required placeholder="0.00" 
+                                    class="w-full bg-retro-dark border border-retro-purple rounded px-3 py-2 text-white focus:outline-none focus:border-retro-cyan transition-all">
+                            </div>
+                        </div>
+
+                        <button type="submit" 
+                            class="w-full mt-2 bg-gradient-to-r from-retro-pink to-retro-purple hover:from-retro-purple hover:to-retro-pink text-white font-tech font-bold py-2.5 rounded-lg box-glow-pink transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> INSERIR ITEM NO ORÇAMENTO
+                        </button>
+                    </form>
+                </section>
+            </div>
+
+            <!-- COLUNA DIREITA: TABELA DE ITENS + VALORES + WHATSAPP (7 colunas) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- 3. LISTA DE ITENS DO ORÇAMENTO -->
+                <section class="border-2 border-retro-yellow rounded-xl p-4 bg-retro-card box-glow-pink flex-1 flex flex-col">
+                    <div class="flex justify-between items-center mb-3 border-b border-retro-yellow/30 pb-2">
+                        <h2 class="font-tech text-base sm:text-lg text-retro-yellow font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-retro-green"></i> 3. RESUMO DO ORÇAMENTO
+                        </h2>
+                        <span id="totalItensBadge" class="bg-retro-dark text-retro-cyan text-xs px-2 py-0.5 rounded border border-retro-cyan">
+                            0 itens
+                        </span>
+                    </div>
+
+                    <!-- Tabela responsiva de Itens -->
+                    <div class="overflow-x-auto flex-1 min-h-[180px]">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-xs text-retro-cyan border-b border-retro-purple/40">
+                                    <th class="py-2 px-2">Descrição</th>
+                                    <th class="py-2 px-1 text-center">Tipo</th>
+                                    <th class="py-2 px-2 text-center">Qtd</th>
+                                    <th class="py-2 px-2 text-right">Unit.</th>
+                                    <th class="py-2 px-2 text-right">Total</th>
+                                    <th class="py-2 px-1 text-center no-print">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaItens" class="divide-y divide-retro-purple/20">
+                                <!-- Preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+
+                        <div id="emptyMsg" class="py-10 text-center text-gray-400 font-pixel text-xl">
+                            <i class="fa-solid fa-triangle-exclamation text-retro-pink mb-2 text-2xl"></i><br>
+                            Nenhum item adicionado ao orçamento ainda...
+                        </div>
+                    </div>
+
+                    <!-- CONDICIONAIS DE PAGAMENTO, DESCONTO E GARANTIA -->
+                    <div class="mt-4 pt-4 border-t border-retro-purple/40 grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+                        <div>
+                            <label class="block text-xs text-retro-cyan mb-1">GARANTIA</label>
+                            <select id="orcGarantia" onchange="salvarEstado()" class="w-full bg-retro-dark border border-retro-purple rounded px-2 py-1.5 text-white text-xs focus:outline-none focus:border-retro-cyan">
+                                <option value="30 dias">30 Dias</option>
+                                <option value="90 dias" selected>90 Dias (3 Meses)</option>
+                                <option value="6 meses">6 Meses</option>
+                                <option value="1 ano">1 Ano</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-retro-cyan mb-1">PAGAMENTO</label>
+                            <select id="orcPagamento" onchange="salvarEstado()" class="w-full bg-retro-dark border border-retro-purple rounded px-2 py-1.5 text-white text-xs focus:outline-none focus:border-retro-cyan">
+                                <option value="PIX / Dinheiro">PIX / Dinheiro</option>
+                                <option value="Cartão de Crédito (1x)">Cartão de Crédito (1x)</option>
+                                <option value="Cartão de Crédito (2x até 6x)">Cartão de Crédito (2x a 6x)</option>
+                                <option value="Cartão de Crédito (até 12x)">Cartão de Crédito (até 12x)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-retro-cyan mb-1">DESCONTO (%)</label>
+                            <input type="number" id="orcDescontoPorcentagem" value="0" min="0" max="100" step="1" oninput="atualizarTotais()" 
+                                class="w-full bg-retro-dark border border-retro-purple rounded px-2 py-1.5 text-white text-xs focus:outline-none focus:border-retro-pink" placeholder="Ex: 5">
+                        </div>
+                    </div>
+
+                    <!-- TOTALIZADORES HIGHLIGHT NEON -->
+                    <div class="mt-4 p-3 bg-retro-dark rounded-lg border border-retro-green/40 flex flex-col gap-1 text-right box-glow-green">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>Subtotal (Peças + Serviço):</span>
+                            <span id="subtotalGeral" class="text-white">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-red-400">
+                            <span>Desconto Aplicado:</span>
+                            <span id="valDesconto">- R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg sm:text-2xl font-tech font-bold text-retro-green glow-green border-t border-retro-green/30 pt-2 mt-1">
+                            <span>TOTAL FINAL:</span>
+                            <span id="totalGeral" class="font-pixel text-3xl sm:text-4xl text-retro-yellow glow-yellow">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- BOTÕES DE AÇÃO: WHATSAPP E IMPRESSÃO -->
+                    <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 no-print">
+                        <button onclick="gerarWhatsApp()" 
+                            class="bg-green-600 hover:bg-green-500 text-white font-tech font-bold py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all transform active:scale-95 border-2 border-green-400">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i> ENVIAR VIA WHATSAPP
+                        </button>
+                        
+                        <button onclick="imp
